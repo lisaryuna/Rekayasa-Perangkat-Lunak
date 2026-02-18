@@ -9,7 +9,18 @@ load_dotenv()
 NUM_RUNS_TIMES = 5
 
 # TODO: Fill this in! Try to get as close to 100% correctness across all runs as possible.
-YOUR_SYSTEM_PROMPT = ""
+YOUR_SYSTEM_PROMPT = """
+You are a logical math tutor. Solve the problem by breaking it down into clear steps. 
+
+Follow this structure:
+1. Total distance of the trip.
+2. Distance at the first stop.
+3. Distance at the second stop (calculate from the end of the trip).
+4. Subtraction to find the distance between the two stops.
+
+Be precise and double-check your subtraction. 
+Show your reasoning clearly, but ensure the very last line of your response is exactly in this format: "Answer: <number>"
+"""
 
 USER_PROMPT = """
 Solve this problem, then give the final answer on the last line as "Answer: <number>".
