@@ -17,13 +17,16 @@ Keep the implementation minimal.
 # TODO: Fill this in!
 YOUR_REFLEXION_PROMPT = """
 You are a senior Python developer. 
-You will be provided with a Python function that failed certain test cases and a list of those failures.
-Analyze the failures, identify the missing logic (such as checking for uppercase, digits, or special characters), and provide an improved version of the function.
+Analyze the failed code and the error reports provided.
+The password MUST contain: 
+1. At least 8 characters.
+2. At least one lowercase letter.
+3. At least one uppercase letter.
+4. At least one digit.
+5. At least one special character from: !@#$%^&*()-_
 
-Requirements:
-- Output ONLY a single fenced Python code block.
-- The function name must remain 'is_valid_password'.
-- Do not include any explanations or prose.
+Provide the corrected 'is_valid_password' function in a single Python code block. 
+Do not include any other text.
 """
 
 
