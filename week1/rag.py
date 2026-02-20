@@ -37,7 +37,15 @@ QUESTION = (
 
 
 # TODO: Fill this in!
-YOUR_SYSTEM_PROMPT = ""
+YOUR_SYSTEM_PROMPT = """
+You are an expert Python developer. 
+Your task is to write code based ONLY on the provided API documentation context.
+- Use 'requests' library.
+- Strictly follow the Base URL and endpoint mentioned in the context.
+- Use the exact authentication header name specified.
+- Ensure you handle the JSON response to extract the 'name' field.
+- Provide only the code block.
+"""
 
 
 # For this simple example
@@ -52,10 +60,9 @@ REQUIRED_SNIPPETS = [
 
 
 def YOUR_CONTEXT_PROVIDER(corpus: List[str]) -> List[str]:
-    """TODO: Select and return the relevant subset of documents from CORPUS for this task.
-
-    For example, return [] to simulate missing context, or [corpus[0]] to include the API docs.
-    """
+    """Mengambil dokumen pertama dari corpus yang berisi api_docs.txt"""
+    if corpus and len(corpus) > 0:
+        return [corpus[0]]
     return []
 
 
