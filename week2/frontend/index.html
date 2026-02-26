@@ -13,6 +13,12 @@
       .item { display: flex; align-items: center; gap: 0.5rem; padding: 0.25rem 0; }
       .muted { color: #6b7280; font-size: 0.875rem; }
       .row { display: flex; gap: 0.5rem; align-items: center; }
+      #note-history { margin-top: 2rem; border-top: 1px solid #e5e7eb; padding-top: 1rem; }
+      .note-card { padding: 0.5rem 0; border-bottom: 1px solid #f3f4f6; }
+      .note-card:last-child { border-bottom: none; }
+      .note-title { font-weight: 600; margin-bottom: 0.25rem; }
+      .note-content { white-space: pre-wrap; margin-bottom: 0.25rem; }
+      .note-items { margin-left: 1rem; font-size: 0.9rem; }
     </style>
   </head>
   <body>
@@ -27,11 +33,17 @@
     </div>
 
     <div class="items" id="items"></div>
+    <div class="row" style="margin-top: 0.5rem;">
+      <button id="list-notes">List All Saved Notes</button>
+    </div>
+    <div class="items" id="note-history"></div>
 
     <script>
       const $ = (sel) => document.querySelector(sel);
       const itemsEl = $('#items');
+      const noteHistoryEl = $('#note-history');
       const btn = $('#extract');
+      const listNotesBtn = $('#list-notes');
       btn.addEventListener('click', async () => {
         const text = $('#text').value;
         const save = $('#save_note').checked;
@@ -64,6 +76,34 @@
         } catch (err) {
           console.error(err);
           itemsEl.textContent = 'Error extracting items';
+        }
+      });
+
+      listNotesBtn.addEventListener('click', async () => {
+        noteHistoryEl.textContent = 'Loading notes...';
+        try {
+          const res = await fetch('/notes');
+          if (!res.ok) throw new Error('Request failed');
+          const data = await res.json();
+          if (!Array.isArray(data) || data.length === 0) {
+            noteHistoryEl.innerHTML = '<p class="muted">No saved notes yet.</p>';
+            return;
+          }
+          noteHistoryEl.innerHTML = data.map(note => {
+            const itemsHtml = (note.items && note.items.length > 0)
+              ? `<ul class="note-items">${note.items.map(it => `<li>${it.text}</li>`).join('')}</ul>`
+              : '<p class="muted note-items">No action items saved for this note.</p>';
+            return `
+              <div class="note-card">
+                <div class="note-title">Note #${note.id} <span class="muted">(${note.created_at})</span></div>
+                <div class="note-content">${note.content}</div>
+                ${itemsHtml}
+              </div>
+            `;
+          }).join('');
+        } catch (err) {
+          console.error(err);
+          noteHistoryEl.textContent = 'Error loading notes';
         }
       });
 

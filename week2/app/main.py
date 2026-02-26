@@ -1,15 +1,16 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any, Dict, Optional
+from typing import List
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 
+from . import db
 from .db import init_db
 from .routers import action_items, notes
-from . import db
+from .schemas import NoteWithItemsResponse, ActionItemResponse
 
 init_db()
 
@@ -24,6 +25,33 @@ def index() -> str:
 
 app.include_router(notes.router)
 app.include_router(action_items.router)
+
+
+@app.get("/notes", response_model=List[NoteWithItemsResponse])
+def list_notes() -> List[NoteWithItemsResponse]:
+    rows = db.list_notes()
+    notes_with_items: List[NoteWithItemsResponse] = []
+    for row in rows:
+        items_rows = db.list_action_items(note_id=row["id"])
+        items = [
+            ActionItemResponse(
+                id=item_row["id"],
+                note_id=item_row["note_id"],
+                text=item_row["text"],
+                done=bool(item_row["done"]),
+                created_at=item_row["created_at"],
+            )
+            for item_row in items_rows
+        ]
+        notes_with_items.append(
+            NoteWithItemsResponse(
+                id=row["id"],
+                content=row["content"],
+                created_at=row["created_at"],
+                items=items,
+            )
+        )
+    return notes_with_items
 
 
 static_dir = Path(__file__).resolve().parents[1] / "frontend"
