@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class NoteCreate(BaseModel):
@@ -10,9 +10,7 @@ class NoteRead(BaseModel):
     id: int
     title: str
     content: str
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ActionItemCreate(BaseModel):
@@ -23,6 +21,4 @@ class ActionItemRead(BaseModel):
     id: int
     description: str
     completed: bool
-
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
