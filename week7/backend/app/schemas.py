@@ -3,15 +3,32 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 
 
+class CategoryCreate(BaseModel):
+    name: str = Field(..., max_length=100)
+
+
+class CategoryRead(BaseModel):
+    id: int
+    name: str
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
 class NoteCreate(BaseModel):
     title: str = Field(..., max_length=255)
     content: str = Field(..., min_length=1, max_length=10000)
+    category_id: int | None = Field(None)
 
 
 class NoteRead(BaseModel):
     id: int
     title: str
     content: str
+    category_id: int | None
+    category: CategoryRead | None = None
     created_at: datetime
     updated_at: datetime
 
@@ -22,6 +39,7 @@ class NoteRead(BaseModel):
 class NotePatch(BaseModel):
     title: str | None = Field(None, max_length=255)
     content: str | None = Field(None, min_length=1, max_length=10000)
+    category_id: int | None = None
 
 
 class ActionItemCreate(BaseModel):
@@ -42,4 +60,3 @@ class ActionItemRead(BaseModel):
 class ActionItemPatch(BaseModel):
     description: str | None = Field(None, min_length=1, max_length=10000)
     completed: bool | None = None
-
