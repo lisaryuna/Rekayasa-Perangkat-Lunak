@@ -40,6 +40,6 @@ class ActionItemRead(BaseModel):
 
 
 class ActionItemPatch(BaseModel):
-    description: str | None = Field(None, max_length=10000)
+    description: str | None = Field(None, min_length=1, max_length=10000)
     completed: bool | None = None
 
