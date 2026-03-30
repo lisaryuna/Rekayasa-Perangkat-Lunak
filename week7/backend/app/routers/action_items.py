@@ -38,7 +38,7 @@ def list_items(
 def create_item(payload: ActionItemCreate, db: Session = Depends(get_db)) -> ActionItemRead:
     item = ActionItem(description=payload.description, completed=False)
     db.add(item)
-    db.flush()
+    db.commit()
     db.refresh(item)
     return ActionItemRead.model_validate(item)
 
@@ -50,7 +50,7 @@ def complete_item(item_id: int, db: Session = Depends(get_db)) -> ActionItemRead
         raise HTTPException(status_code=404, detail="Action item not found")
     item.completed = True
     db.add(item)
-    db.flush()
+    db.commit()
     db.refresh(item)
     return ActionItemRead.model_validate(item)
 
@@ -65,8 +65,24 @@ def patch_item(item_id: int, payload: ActionItemPatch, db: Session = Depends(get
     if payload.completed is not None:
         item.completed = payload.completed
     db.add(item)
-    db.flush()
+    db.commit()
     db.refresh(item)
     return ActionItemRead.model_validate(item)
 
+
+@router.get("/{item_id}", response_model=ActionItemRead)
+def get_item(item_id: int, db: Session = Depends(get_db)) -> ActionItemRead:
+    item = db.get(ActionItem, item_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Action item not found")
+    return ActionItemRead.model_validate(item)
+
+
+@router.delete("/{item_id}", status_code=204)
+def delete_item(item_id: int, db: Session = Depends(get_db)) -> None:
+    item = db.get(ActionItem, item_id)
+    if not item:
+        raise HTTPException(status_code=404, detail="Action item not found")
+    db.delete(item)
+    db.commit()
 
