@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevTask Tracker (Flask)</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 20px; }
+        .task-card { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; border-radius: 5px; display: flex; justify-content: space-between; }
+        form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+        input, button { padding: 8px; }
+    </style>
+</head>
+<body>
+    <h1>DevTask Tracker (Flask + Vanilla JS)</h1>
+    
+    <form id="taskForm">
+        <input type="text" id="title" placeholder="Judul Tugas *" required>
+        <input type="text" id="desc" placeholder="Deskripsi (Opsional)">
+        <button type="submit" style="background: #28a745; color: white; border: none;">Tambah Tugas</button>
+    </form>
+
+    <div id="taskList"></div>
+
+    <script>
+        const fetchTasks = async () => {
+            const res = await fetch('/api/tasks');
+            const tasks = await res.json();
+            const list = document.getElementById('taskList');
+            list.innerHTML = tasks.length ? '' : '<p>Belum ada tugas.</p>';
+            
+            tasks.forEach(t => {
+                list.innerHTML += `
+                    <div class="task-card">
+                        <div><strong>${t.title}</strong><br><small>${t.description}</small></div>
+                        <button onclick="deleteTask(${t.id})" style="background: #dc3545; color: white; border: none; cursor: pointer;">Hapus</button>
+                    </div>
+                `;
+            });
+        };
+
+        document.getElementById('taskForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('title').value;
+            const desc = document.getElementById('desc').value;
+            
+            await fetch('/api/tasks', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ title, description: desc })
+            });
+            
+            document.getElementById('title').value = '';
+            document.getElementById('desc').value = '';
+            fetchTasks();
+        });
+
+        const deleteTask = async (id) => {
+            await fetch(`/api/tasks/${id}`, { method: 'DELETE' });
+            fetchTasks();
+        };
+
+        // Load tasks on startup
+        fetchTasks();
+    </script>
+</body>
+</html>
