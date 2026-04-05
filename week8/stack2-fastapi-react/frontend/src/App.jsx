@@ -6,8 +6,7 @@ function App() {
   const [title, setTitle] = useState('');
   const [desc, setDesc] = useState('');
 
-  // Ini alamat backend FastAPI kamu
-  const API_URL = "http://127.0.0.1:8000/tasks";
+  const API_URL = "http://localhost:8000/tasks";
 
   const fetchTasks = async () => {
     try {
